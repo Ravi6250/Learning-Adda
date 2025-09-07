@@ -1,0 +1,12 @@
+{
+  "name": "lms-full-stack",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u0000l\u0000m\u0000s\u0000-\u0000f\u0000u\u0000l\u0000l\u0000-\u0000s\u0000t\u0000a\u0000c\u0000k\u0000\r\u0000 \u0000",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
