@@ -1,18 +1,28 @@
 import mongoose from "mongoose";
 
 const PurchaseSchema = new mongoose.Schema({
-    courseId: { type: mongoose.Schema.Types.ObjectId,
+    courseId: { 
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Course',
         required: true
-    },
+    }, // <-- Yahan comma aur bracket lagaya hai jo missing tha
+    
     userId: {
-        type: String,
+        type: String,  // Clerk ID
         ref: 'User',
         required: true
     },
-    amount: { type: Number, required: true },
-    status: { type: String, enum: ['pending', 'completed', 'failed'], default: 'pending' }
 
+    amount: { 
+        type: Number, 
+        required: true 
+    },
+    
+    status: { 
+        type: String, 
+        enum: ['pending', 'completed', 'failed'], 
+        default: 'pending' 
+    }
 }, { timestamps: true });
 
 export const Purchase = mongoose.model('Purchase', PurchaseSchema);

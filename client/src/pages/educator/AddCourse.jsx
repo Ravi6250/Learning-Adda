@@ -1,9 +1,8 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { assets } from '../../assets/assets';
-import { toast } from 'react-toastify'
+import { toast } from 'react-toastify';
 import Quill from 'quill';
-import uniqid from 'uniqid';
-import axios from 'axios'
+import axios from 'axios';
 import { AppContext } from '../../context/AppContext';
 
 const AddCourse = () => {
@@ -11,12 +10,12 @@ const AddCourse = () => {
   const editorRef = useRef(null);
   const quillRef = useRef(null);
 
-  const { backendUrl, getToken } = useContext(AppContext)
+  const { backendUrl, getToken } = useContext(AppContext);
 
-  const [courseTitle, setCourseTitle] = useState('')
-  const [coursePrice, setCoursePrice] = useState(0)
-  const [discount, setDiscount] = useState(0)
-  const [image, setImage] = useState(null)
+  const [courseTitle, setCourseTitle] = useState('');
+  const [coursePrice, setCoursePrice] = useState(0);
+  const [discount, setDiscount] = useState(0);
+  const [image, setImage] = useState(null);
   const [chapters, setChapters] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [currentChapterId, setCurrentChapterId] = useState(null);
@@ -27,12 +26,17 @@ const AddCourse = () => {
     isPreviewFree: false,
   });
 
+  // ✅ Simple Unique ID generator (Replacement for uniqid library)
+  const generateUniqueID = () => {
+     return Math.floor(Math.random() * Date.now()).toString(16);
+  }
+
   const handleChapter = (action, chapterId) => {
     if (action === 'add') {
       const title = prompt('Enter Chapter Name:');
       if (title) {
         const newChapter = {
-          chapterId: uniqid(),
+          chapterId: generateUniqueID(), // ✅ Updated
           chapterTitle: title,
           chapterContent: [],
           collapsed: false,
@@ -74,7 +78,7 @@ const AddCourse = () => {
           const newLecture = {
             ...lectureDetails,
             lectureOrder: chapter.chapterContent.length > 0 ? chapter.chapterContent.slice(-1)[0].lectureOrder + 1 : 1,
-            lectureId: uniqid()
+            lectureId: generateUniqueID() // ✅ Updated
           };
           chapter.chapterContent.push(newLecture);
         }
@@ -92,11 +96,9 @@ const AddCourse = () => {
 
   const handleSubmit = async (e) => {
     try {
-
       e.preventDefault();
-
       if (!image) {
-        toast.error('Thumbnail Not Selected')
+        toast.error('Thumbnail Not Selected');
       }
 
       const courseData = {
@@ -105,48 +107,42 @@ const AddCourse = () => {
         coursePrice: Number(coursePrice),
         discount: Number(discount),
         courseContent: chapters,
-      }
+      };
 
-      const formData = new FormData()
-      formData.append('courseData', JSON.stringify(courseData))
-      formData.append('image', image)
+      const formData = new FormData();
+      formData.append('courseData', JSON.stringify(courseData));
+      formData.append('image', image);
 
-      const token = await getToken()
+      const token = await getToken();
 
       const { data } = await axios.post(backendUrl + '/api/educator/add-course', formData,
         { headers: { Authorization: `Bearer ${token}` } }
-      )
+      );
 
       if (data.success) {
-        toast.success(data.message)
-        setCourseTitle('')
-        setCoursePrice(0)
-        setDiscount(0)
-        setImage(null)
-        setChapters([])
-        quillRef.current.root.innerHTML = ""
-      } else (
-        toast.error(data.message)
-      )
+        toast.success(data.message);
+        setCourseTitle('');
+        setCoursePrice(0);
+        setDiscount(0);
+        setImage(null);
+        setChapters([]);
+        quillRef.current.root.innerHTML = "";
+      } else {
+        toast.error(data.message);
+      }
 
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error.message);
     }
-
   };
 
   useEffect(() => {
-    // Initiate Quill only once
     if (!quillRef.current && editorRef.current) {
       quillRef.current = new Quill(editorRef.current, {
         theme: 'snow',
       });
     }
   }, []);
-
-  useEffect(() => {
-    console.log(chapters);
-  }, [chapters]);
 
   return (
     <div className='h-screen overflow-scroll flex flex-col items-start justify-between md:p-8 md:pb-0 p-4 pt-8 pb-0'>
@@ -165,7 +161,7 @@ const AddCourse = () => {
           <div className='flex flex-col gap-1'>
             <p>Course Price</p>
             <input onChange={e => setCoursePrice(e.target.value)} value={coursePrice} type="number" placeholder='0' className='outline-none md:py-2.5 py-2 w-28 px-3 rounded border border-gray-500' required />
-          </ div>
+          </div>
 
           <div className='flex md:flex-row flex-col items-center gap-3'>
             <p>Course Thumbnail</p>
@@ -182,7 +178,6 @@ const AddCourse = () => {
           <input onChange={e => setDiscount(e.target.value)} value={discount} type="number" placeholder='0' min={0} max={100} className='outline-none md:py-2.5 py-2 w-28 px-3 rounded border border-gray-500' required />
         </div>
 
-        {/* Adding Chapters & Lectures */}
         <div>
           {chapters.map((chapter, chapterIndex) => (
             <div key={chapterIndex} className="bg-white border rounded-lg mb-4">
@@ -219,38 +214,19 @@ const AddCourse = () => {
                 <h2 className="text-lg font-semibold mb-4">Add Lecture</h2>
                 <div className="mb-2">
                   <p>Lecture Title</p>
-                  <input
-                    type="text"
-                    className="mt-1 block w-full border rounded py-1 px-2"
-                    value={lectureDetails.lectureTitle}
-                    onChange={(e) => setLectureDetails({ ...lectureDetails, lectureTitle: e.target.value })}
-                  />
+                  <input type="text" className="mt-1 block w-full border rounded py-1 px-2" value={lectureDetails.lectureTitle} onChange={(e) => setLectureDetails({ ...lectureDetails, lectureTitle: e.target.value })} />
                 </div>
                 <div className="mb-2">
                   <p>Duration (minutes)</p>
-                  <input
-                    type="number"
-                    className="mt-1 block w-full border rounded py-1 px-2"
-                    value={lectureDetails.lectureDuration}
-                    onChange={(e) => setLectureDetails({ ...lectureDetails, lectureDuration: e.target.value })}
-                  />
+                  <input type="number" className="mt-1 block w-full border rounded py-1 px-2" value={lectureDetails.lectureDuration} onChange={(e) => setLectureDetails({ ...lectureDetails, lectureDuration: e.target.value })} />
                 </div>
                 <div className="mb-2">
                   <p>Lecture URL</p>
-                  <input
-                    type="text"
-                    className="mt-1 block w-full border rounded py-1 px-2"
-                    value={lectureDetails.lectureUrl}
-                    onChange={(e) => setLectureDetails({ ...lectureDetails, lectureUrl: e.target.value })}
-                  />
+                  <input type="text" className="mt-1 block w-full border rounded py-1 px-2" value={lectureDetails.lectureUrl} onChange={(e) => setLectureDetails({ ...lectureDetails, lectureUrl: e.target.value })} />
                 </div>
                 <div className="flex gap-2 my-4">
                   <p>Is Preview Free?</p>
-                  <input
-                    type="checkbox" className='mt-1 scale-125'
-                    checked={lectureDetails.isPreviewFree}
-                    onChange={(e) => setLectureDetails({ ...lectureDetails, isPreviewFree: e.target.checked })}
-                  />
+                  <input type="checkbox" className='mt-1 scale-125' checked={lectureDetails.isPreviewFree} onChange={(e) => setLectureDetails({ ...lectureDetails, isPreviewFree: e.target.checked })} />
                 </div>
                 <button type='button' className="w-full bg-blue-400 text-white px-4 py-2 rounded" onClick={addLecture}>Add</button>
                 <img onClick={() => setShowPopup(false)} src={assets.cross_icon} className='absolute top-4 right-4 w-4 cursor-pointer' alt="" />
