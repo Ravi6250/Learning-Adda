@@ -15,6 +15,7 @@ import { ToastContainer } from 'react-toastify'
 import Player from './pages/student/Player'
 import MyEnrollments from './pages/student/MyEnrollments'
 import Loading from './components/student/Loading'
+import Quiz from './components/student/Quiz'; // Ye import hona zaruri hai
 
 const App = () => {
 
@@ -23,8 +24,10 @@ const App = () => {
   return (
     <div className="text-default min-h-screen bg-white">
       <ToastContainer />
+      
       {/* Render Student Navbar only if not on educator routes */}
       {!isEducatorRoute && <Navbar />}
+      
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/course/:id" element={<CourseDetails />} />
@@ -33,6 +36,10 @@ const App = () => {
         <Route path="/my-enrollments" element={<MyEnrollments />} />
         <Route path="/player/:courseId" element={<Player />} />
         <Route path="/loading/:path" element={<Loading />} />
+        
+        {/* ✅ Yahan maine Quiz route add kiya hai */}
+        <Route path="/quiz" element={<Quiz />} />
+
         <Route path='/educator' element={<Educator />}>
           <Route path='/educator' element={<Dashboard />} />
           <Route path='add-course' element={<AddCourse />} />

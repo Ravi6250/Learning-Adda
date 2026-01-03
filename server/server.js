@@ -8,6 +8,7 @@ import educatorRouter from './routes/educatorRoutes.js';
 import courseRouter from './routes/courseRoute.js';
 import { clerkMiddleware } from '@clerk/express';
 import { clerkWebhooks, stripeWebhooks } from './controllers/webhooks.js';
+import aiRoutes from './routes/aiRoutes.js';
 
 const startServer = async () => {
   try {
@@ -57,6 +58,7 @@ const startServer = async () => {
     app.use('/api/user', userRouter);
     app.use('/api/educator', educatorRouter);
     app.use('/api/course', courseRouter);
+    app.use('/api/ai', aiRoutes);
 
     // ✅ Start listening
     const PORT = process.env.PORT || 3300;
