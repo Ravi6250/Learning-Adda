@@ -25,15 +25,19 @@ const startServer = async () => {
     app.use(cors({
       origin: (origin, callback) => {
         
-        // This is the clean, final list. 5173 has been removed.
         const allowedOrigins = [
-          'http://localhost:5174', // This is the only allowed development port now.
-          process.env.FRONTEND_URL, 
+          'http://localhost:5173',  // Default Vite Port
+          'http://localhost:5174',  // Tumhara Custom Port
+          'https://learning-adda.vercel.app', // ✅ Tumhara Main Vercel App
+          'https://learning-adda-frontend.vercel.app', // (Optional) Agar naam change hua ho
+          process.env.FRONTEND_URL // Render Env variable fallback
         ];
 
+        // Agar origin allowed list me hai, ya request server-to-server (no origin) hai:
         if (!origin || allowedOrigins.includes(origin)) {
           callback(null, true); // Allow the request
         } else {
+          console.log("Blocked by CORS:", origin); // Logs me dikhega kisne block kiya
           callback(new Error('Not allowed by CORS')); // Block all others
         }
       },
