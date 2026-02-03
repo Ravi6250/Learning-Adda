@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react'; // 1. useContext add kiya
 import axios from 'axios';
+import { AppContext } from '../../context/AppContext'; // 2. AppContext import kiya
 
 const Quiz = ({ topic }) => {
+  // 3. Backend URL Context se nikala
+  const { backendUrl } = useContext(AppContext);
+
   // Agar prop se topic aaya to wo use karo, nahi to user input karega
   const [searchTopic, setSearchTopic] = useState(topic || ""); 
   const [quizData, setQuizData] = useState(null);
@@ -21,8 +25,8 @@ const Quiz = ({ topic }) => {
     setShowResult(false);
 
     try {
-      // NOTE: Port 3300 use kiya hai aapke server log ke hisaab se
-      const { data } = await axios.post('http://localhost:3300/api/ai/generate-quiz', {
+      // ✅ 4. FIX: Localhost hata kar backendUrl use kiya
+      const { data } = await axios.post(`${backendUrl}/api/ai/generate-quiz`, {
         topic: searchTopic
       });
 

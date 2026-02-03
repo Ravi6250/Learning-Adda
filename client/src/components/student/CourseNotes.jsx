@@ -1,7 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react'; // 1. useContext import kiya
 import axios from 'axios';
+import { AppContext } from '../../context/AppContext'; // 2. AppContext import kiya
 
 const CourseNotes = ({ lectureTitle, lectureDescription }) => {
+  // 3. Backend URL Context se nikala
+  const { backendUrl } = useContext(AppContext);
+
   const [summaryData, setSummaryData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -17,8 +21,8 @@ const CourseNotes = ({ lectureTitle, lectureDescription }) => {
     setError(null);
 
     try {
-      // Backend Route check karlena (Port 3300 ya 5000 jo bhi aapka server port hai)
-      const { data } = await axios.post('http://localhost:3300/api/ai/generate-summary', {
+      // ✅ 4. FIX: Localhost hata kar backendUrl use kiya
+      const { data } = await axios.post(`${backendUrl}/api/ai/generate-summary`, {
         lectureTitle: lectureTitle,
         lectureDescription: lectureDescription || "Generate key takeaways for this lecture."
       });
