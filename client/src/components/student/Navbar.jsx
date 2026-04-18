@@ -5,6 +5,8 @@ import { AppContext } from '../../context/AppContext';
 import { useClerk, UserButton, useUser } from '@clerk/clerk-react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+// 👇 1. ThemeToggle import karo (Path check karlena jahan file save ki hai)
+import ThemeToggle from '../ThemeToggle'; 
 
 const Navbar = () => {
   const location = useLocation();
@@ -17,17 +19,15 @@ const Navbar = () => {
 
   const becomeEducator = async () => {
     try {
-    
       if (isEducator) {
         navigate('/educator');
         return;
       }
 
       const token = await getToken();
-  console.log(token)
+      console.log(token)
       const { data } = await axios.get(
         `${backendUrl}/api/educator/update-role`,
-         // Empty object as body if your endpoint doesn't need data
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -55,30 +55,33 @@ const Navbar = () => {
   };
 
   return (
-    <div className={`flex items-center justify-between px-4 sm:px-10 md:px-14 lg:px-36 border-b border-gray-500 py-4 ${isCoursesListPage ? 'bg-white' : 'bg-cyan-100/70'}`}>
-      {/* <img 
-        onClick={() => navigate('/')} 
-        src={assets.logo} 
-        alt="Logo" 
-        className="w-28 lg:w-32 cursor-pointer" 
-      /> */}
-      <h1 className="text-2xl font-bold text-dark">Learning Adda</h1>
+    // 👇 2. Navbar ke background aur border ko dark mode (dark:bg-gray-900) friendly banaya
+    <div className={`flex items-center justify-between px-4 sm:px-10 md:px-14 lg:px-36 border-b border-gray-500 dark:border-gray-700 py-4 transition-colors duration-300 ${isCoursesListPage ? 'bg-white dark:bg-gray-900' : 'bg-cyan-100/70 dark:bg-gray-800'}`}>
+      
+      {/* 👇 3. Title text color ko dark mode mein white kiya */}
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white cursor-pointer" onClick={() => navigate('/')}>
+        Learning Adda
+      </h1>
       
       {/* Desktop Navigation */}
-      <div className="md:flex hidden items-center gap-5 text-gray-500">
+      <div className="md:flex hidden items-center gap-5 text-gray-500 dark:text-gray-300">
         <div className="flex items-center gap-5">
           {user && (
             <>
               <button 
                 onClick={becomeEducator}
-                className="hover:text-blue-600 transition-colors"
+                className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >
                 {isEducator ? 'Educator Dashboard' : 'Become Educator'}
               </button>
-              | <Link to='/my-enrollments' className="hover:text-blue-600 transition-colors">My Enrollments</Link>
+              | <Link to='/my-enrollments' className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">My Enrollments</Link>
             </>
           )}
         </div>
+        
+        {/* 👇 4. ThemeToggle Button yahan lagaya Desktop ke liye */}
+        <ThemeToggle />
+
         {user ? (
           <UserButton />
         ) : (
@@ -92,25 +95,29 @@ const Navbar = () => {
       </div>
       
       {/* Mobile Navigation */}
-      <div className="md:hidden flex items-center gap-2 sm:gap-5 text-gray-500">
+      <div className="md:hidden flex items-center gap-2 sm:gap-5 text-gray-500 dark:text-gray-300">
         <div className="flex items-center gap-1 sm:gap-2 max-sm:text-xs">
           {user && (
             <>
               <button 
                 onClick={becomeEducator}
-                className="hover:text-blue-600 transition-colors"
+                className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >
                 {isEducator ? 'Educator' : 'Become Educator'}
               </button>
-              | <Link to='/my-enrollments' className="hover:text-blue-600 transition-colors">My Courses</Link>
+              | <Link to='/my-enrollments' className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">My Courses</Link>
             </>
           )}
         </div>
+
+        {/* 👇 5. ThemeToggle Button yahan lagaya Mobile ke liye */}
+        <ThemeToggle />
+
         {user ? (
           <UserButton />
         ) : (
           <button onClick={() => openSignIn()}>
-            <img src={assets.user_icon} alt="User icon" className="w-6 h-6" />
+            <img src={assets.user_icon} alt="User icon" className="w-6 h-6 dark:invert" /> {/* dark:invert black icon ko white kar dega */}
           </button>
         )}
       </div>

@@ -15,11 +15,36 @@ export const AppContextProvider = (props) => {
     const { getToken } = useAuth();
     const { user, isLoaded } = useUser();
 
+    // --- EXISTING STATES ---
     const [isEducator, setIsEducator] = useState(false);
     const [allCourses, setAllCourses] = useState([]);
     const [userData, setUserData] = useState(null);
     const [enrolledCourses, setEnrolledCourses] = useState([]);
     const [isUserLoading, setIsUserLoading] = useState(true);
+
+    // ==========================================
+    // 🌙 NEW: DARK MODE (THEME) STATE & LOGIC
+    // ==========================================
+    const [theme, setTheme] = useState(
+        localStorage.getItem('theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+    );
+
+    useEffect(() => {
+        const root = window.document.documentElement;
+        if (theme === 'dark') {
+            root.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            root.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        }
+    }, [theme]);
+
+    const toggleTheme = () => {
+        setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
+    };
+    // ==========================================
 
     // --- 1. Fetch All Courses (Public) ---
     const fetchAllCourses = async () => {
@@ -71,7 +96,6 @@ export const AppContextProvider = (props) => {
 
     // --- 3. Fetch Enrolled Courses ---
     const fetchUserEnrolledCourses = async () => {
-        // Agar user logged in nahi hai ya loading hai, toh run mat karo
         if(!user && !isLoaded) return; 
 
         try {
@@ -81,7 +105,6 @@ export const AppContextProvider = (props) => {
             });
 
             if (data.success) {
-                // Reverse isliye taaki latest course sabse pehle dikhe
                 setEnrolledCourses(data.enrolledCourses.reverse());
             } else {
                 toast.error(data.message || "Failed to fetch enrolled courses");
@@ -92,8 +115,7 @@ export const AppContextProvider = (props) => {
         }
     };
 
-    // --- Helper Functions (MOVED INSIDE COMPONENT) ---
-
+    // --- Helper Functions ---
     const calculateChapterTime = (chapter) => {
         if (!chapter || !chapter.chapterContent) return 'N/A';
         let time = 0;
@@ -120,7 +142,6 @@ export const AppContextProvider = (props) => {
     };
 
     // --- Effects ---
-
     useEffect(() => {
         fetchAllCourses();
     }, []);
@@ -146,7 +167,7 @@ export const AppContextProvider = (props) => {
         allCourses,
         fetchAllCourses,
         enrolledCourses,
-        fetchUserEnrolledCourses, // <--- Ye function export ho raha hai
+        fetchUserEnrolledCourses,
         calculateChapterTime,
         calculateCourseDuration,
         calculateRating,
@@ -154,6 +175,9 @@ export const AppContextProvider = (props) => {
         isEducator,
         setIsEducator,
         isUserLoading,
+        // 👇 NEW: Exporting theme variables so any component can use them
+        theme,
+        toggleTheme, 
     };
 
     return <AppContext.Provider value={value}>{props.children}</AppContext.Provider>;

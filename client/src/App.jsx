@@ -22,7 +22,8 @@ const App = () => {
   const isEducatorRoute = useMatch('/educator/*');
 
   return (
-    <div className="text-default min-h-screen bg-white">
+    // 👇 YAHAN CHANGE KIYA HAI: bg-white ke sath dark classes aur transition add kiya hai
+    <div className="text-default min-h-screen bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
       <ToastContainer />
       
       {/* Render Student Navbar only if not on educator routes */}

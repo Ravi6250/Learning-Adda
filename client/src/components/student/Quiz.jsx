@@ -1,20 +1,18 @@
-import React, { useState, useContext } from 'react'; // 1. useContext add kiya
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
-import { AppContext } from '../../context/AppContext'; // 2. AppContext import kiya
+import { AppContext } from '../../context/AppContext'; 
 
 const Quiz = ({ topic }) => {
-  // 3. Backend URL Context se nikala
   const { backendUrl } = useContext(AppContext);
 
-  // Agar prop se topic aaya to wo use karo, nahi to user input karega
   const [searchTopic, setSearchTopic] = useState(topic || ""); 
   const [quizData, setQuizData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedAnswers, setSelectedAnswers] = useState({});
+  // 👇 Ye hai hamari state jisko true karna hai
   const [showResult, setShowResult] = useState(false);
 
-  // Quiz Generate Karne ka Function
   const handleGenerateQuiz = async () => {
     if (!searchTopic) return alert("Please enter a topic first!");
     
@@ -25,7 +23,6 @@ const Quiz = ({ topic }) => {
     setShowResult(false);
 
     try {
-      // ✅ 4. FIX: Localhost hata kar backendUrl use kiya
       const { data } = await axios.post(`${backendUrl}/api/ai/generate-quiz`, {
         topic: searchTopic
       });
@@ -43,7 +40,6 @@ const Quiz = ({ topic }) => {
     }
   };
 
-  // Option select karne par
   const handleOptionSelect = (questionIndex, option) => {
     setSelectedAnswers({
       ...selectedAnswers,
@@ -51,7 +47,6 @@ const Quiz = ({ topic }) => {
     });
   };
 
-  // Score count karna
   const calculateScore = () => {
     let score = 0;
     quizData.forEach((q, index) => {
@@ -63,64 +58,73 @@ const Quiz = ({ topic }) => {
   };
 
   return (
-    <div style={styles.container}>
+    <div className="p-5 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 max-w-2xl mx-auto shadow-md transition-colors duration-300">
       
-      <div style={styles.header}>
-        <h3>🤖 AI Quiz Generator</h3>
-        {/* Agar topic prop nahi diya, to input dikhao */}
+      {/* Header */}
+      <div className="mb-4 text-center">
+        <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">🤖 AI Quiz Generator</h3>
+        
         {!topic && !quizData && (
           <input 
             type="text" 
             placeholder="Enter Topic (e.g. React Hooks)" 
             value={searchTopic}
             onChange={(e) => setSearchTopic(e.target.value)}
-            style={styles.input}
+            className="p-2.5 w-4/5 mb-2.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 transition-colors"
           />
         )}
       </div>
 
       {/* Generate Button */}
       {!quizData && !loading && (
-        <button onClick={handleGenerateQuiz} style={styles.buttonPrimary}>
-          {topic ? `Start ${topic} Quiz` : "Generate Quiz"}
-        </button>
+        <div className="text-center">
+          <button onClick={handleGenerateQuiz} className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-md cursor-pointer text-base transition-colors">
+            {topic ? `Start ${topic} Quiz` : "Generate Quiz"}
+          </button>
+        </div>
       )}
 
       {/* Loading State */}
       {loading && (
-        <div style={{ margin: '20px 0', color: '#6366f1' }}>
+        <div className="my-5 text-indigo-500 dark:text-indigo-400 text-center animate-pulse">
           <p>⏳ Thinking unique questions...</p>
         </div>
       )}
 
       {/* Error Message */}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className="text-red-500 text-center">{error}</p>}
 
       {/* Quiz Questions */}
       {quizData && (
-        <div style={styles.quizBox}>
+        <div className="mt-5 text-left">
           {quizData.map((q, index) => (
-            <div key={index} style={styles.questionCard}>
-              <p style={styles.questionText}><strong>Q{index + 1}: {q.question}</strong></p>
+            <div key={index} className="mb-5 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-100 dark:border-gray-600 transition-colors">
+              <p className="text-base mb-3 text-gray-900 dark:text-gray-100"><strong>Q{index + 1}: {q.question}</strong></p>
               
-              <div style={styles.optionsGrid}>
+              <div className="flex flex-col gap-2">
                 {q.options.map((opt, i) => {
                   const isSelected = selectedAnswers[index] === opt;
                   const isCorrect = showResult && opt === q.correctAnswer;
                   const isWrong = showResult && isSelected && opt !== q.correctAnswer;
                   
-                  // Styles for options
-                  let btnStyle = { ...styles.optionBtn };
-                  if (isCorrect) btnStyle = { ...btnStyle, ...styles.correct };
-                  if (isWrong) btnStyle = { ...btnStyle, ...styles.wrong };
-                  if (!showResult && isSelected) btnStyle = { ...btnStyle, ...styles.selected };
+                  let btnClass = "p-2.5 text-left bg-white dark:bg-gray-800 border rounded-md cursor-pointer transition-colors duration-200 ";
+                  
+                  if (isCorrect) {
+                    btnClass += "bg-green-100 dark:bg-green-900/40 border-green-500 text-green-800 dark:text-green-400";
+                  } else if (isWrong) {
+                    btnClass += "bg-red-100 dark:bg-red-900/40 border-red-500 text-red-800 dark:text-red-400";
+                  } else if (!showResult && isSelected) {
+                    btnClass += "bg-indigo-50 dark:bg-indigo-900/40 border-indigo-500 text-indigo-800 dark:text-indigo-300";
+                  } else {
+                    btnClass += "border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700";
+                  }
 
                   return (
                     <button
                       key={i}
                       onClick={() => handleOptionSelect(index, opt)}
                       disabled={showResult}
-                      style={btnStyle}
+                      className={btnClass}
                     >
                       {opt}
                     </button>
@@ -132,16 +136,19 @@ const Quiz = ({ topic }) => {
 
           {/* Submit Button */}
           {!showResult && (
-            <button onClick={() => setShowResult(true)} style={styles.buttonSuccess}>
-              Submit Quiz
-            </button>
+            <div className="text-center mt-4">
+              {/* ✅ YAHAN FIX KIYA HAI: setShowQuiz(true) ko setShowResult(true) kar diya */}
+              <button onClick={() => setShowResult(true)} className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-md cursor-pointer text-base transition-colors">
+                Submit Quiz
+              </button>
+            </div>
           )}
 
           {/* Result Section */}
           {showResult && (
-            <div style={styles.resultBox}>
-              <h3>You Scored: {calculateScore()} / 5</h3>
-              <button onClick={handleGenerateQuiz} style={styles.buttonSecondary}>
+            <div className="mt-5 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg text-center border border-green-500 transition-colors">
+              <h3 className="text-xl font-bold text-green-700 dark:text-green-400">You Scored: {calculateScore()} / 5</h3>
+              <button onClick={handleGenerateQuiz} className="bg-gray-700 hover:bg-gray-800 dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-4 py-2 rounded-md cursor-pointer mt-3 transition-colors">
                 Try Another Quiz
               </button>
             </div>
@@ -150,25 +157,6 @@ const Quiz = ({ topic }) => {
       )}
     </div>
   );
-};
-
-// CSS Styles Object
-const styles = {
-  container: { padding: '20px', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff', maxWidth: '600px', margin: '20px auto', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' },
-  header: { marginBottom: '15px', textAlign: 'center' },
-  input: { padding: '10px', width: '80%', marginBottom: '10px', borderRadius: '5px', border: '1px solid #ccc' },
-  buttonPrimary: { background: '#4f46e5', color: '#fff', padding: '10px 20px', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '16px' },
-  buttonSuccess: { background: '#22c55e', color: '#fff', padding: '12px 24px', border: 'none', borderRadius: '6px', cursor: 'pointer', marginTop: '10px', fontSize: '16px' },
-  buttonSecondary: { background: '#374151', color: '#fff', padding: '8px 16px', border: 'none', borderRadius: '6px', cursor: 'pointer', marginTop: '10px' },
-  quizBox: { marginTop: '20px', textAlign: 'left' },
-  questionCard: { marginBottom: '20px', padding: '15px', background: '#f9fafb', borderRadius: '8px', border: '1px solid #eee' },
-  questionText: { fontSize: '16px', marginBottom: '10px' },
-  optionsGrid: { display: 'flex', flexDirection: 'column', gap: '8px' },
-  optionBtn: { padding: '10px', textAlign: 'left', background: '#fff', border: '1px solid #d1d5db', borderRadius: '6px', cursor: 'pointer', transition: '0.2s' },
-  selected: { background: '#e0e7ff', borderColor: '#6366f1' },
-  correct: { background: '#dcfce7', borderColor: '#22c55e' },
-  wrong: { background: '#fee2e2', borderColor: '#ef4444' },
-  resultBox: { marginTop: '20px', padding: '15px', background: '#ecfdf5', borderRadius: '8px', textAlign: 'center', border: '1px solid #22c55e' }
 };
 
 export default Quiz;

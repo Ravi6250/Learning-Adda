@@ -34,13 +34,17 @@ const MyCourses = () => {
   }, [isEducator])
 
   return courses ? (
-    <div className='h-screen flex-1 flex flex-col gap-5 md:p-8 md:pb-0 p-4 pt-8 pb-0 overflow-scroll'>
+    // 👇 1. Main container me transition lagaya
+    <div className='h-screen flex-1 flex flex-col gap-5 md:p-8 md:pb-0 p-4 pt-8 pb-0 overflow-scroll transition-colors duration-300'>
       <div className='w-full'>
-        <h2 className="pb-4 text-lg font-medium">My Courses</h2>
+        {/* 👇 2. Heading text color */}
+        <h2 className="pb-4 text-lg font-medium dark:text-white">My Courses</h2>
         
-        <div className="flex flex-col items-center max-w-4xl w-full overflow-hidden rounded-md bg-white border border-gray-500/20">
+        {/* 👇 3. Table Container Dark Mode Fix */}
+        <div className="flex flex-col items-center max-w-4xl w-full overflow-hidden rounded-md bg-white dark:bg-gray-800 border border-gray-500/20 dark:border-gray-700 transition-colors duration-300">
           <table className="md:table-auto table-fixed w-full overflow-hidden">
-            <thead className="text-gray-900 border-b border-gray-500/20 text-sm text-left">
+            {/* 👇 4. Table Header Dark Mode Fix */}
+            <thead className="text-gray-900 dark:text-gray-200 border-b border-gray-500/20 dark:border-gray-700 text-sm text-left">
               <tr>
                 <th className="px-4 py-3 font-semibold truncate">All Courses</th>
                 <th className="px-4 py-3 font-semibold truncate">Earnings</th>
@@ -48,9 +52,12 @@ const MyCourses = () => {
                 <th className="px-4 py-3 font-semibold truncate">Published On</th>
               </tr>
             </thead>
-            <tbody className="text-sm text-gray-500">
+            
+            {/* 👇 5. Table Body Dark Mode Fix */}
+            <tbody className="text-sm text-gray-500 dark:text-gray-400">
               {courses.map((course) => (
-                <tr key={course._id} className="border-b border-gray-500/20">
+                // 👇 6. Table Row pe border fix aur hover effect daala
+                <tr key={course._id} className="border-b border-gray-500/20 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                   <td className="md:px-4 px-2 py-3 flex items-center space-x-3 truncate">
                     
                     {/* --- IMAGE KO CLICKABLE BANAYA --- */}
@@ -59,15 +66,15 @@ const MyCourses = () => {
                     </Link>
 
                     <div className='flex flex-col truncate'>
-                      {/* --- NAME KO CLICKABLE BANAYA --- */}
+                      {/* --- NAME KO CLICKABLE BANAYA (Dark mode colors updated) --- */}
                       <Link 
                         to={`/course/${course._id}`} 
-                        className="font-medium text-gray-800 hover:text-blue-600 hover:underline cursor-pointer truncate"
+                        className="font-medium text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 hover:underline cursor-pointer truncate transition-colors"
                       >
                         {course.courseTitle}
                       </Link>
                       
-                      <span className='text-xs text-gray-500'>{new Date(course.createdAt).toLocaleDateString()}</span>
+                      <span className='text-xs text-gray-500 dark:text-gray-400'>{new Date(course.createdAt).toLocaleDateString()}</span>
                     </div>
                   </td>
                   
